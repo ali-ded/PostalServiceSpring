@@ -2,6 +2,7 @@ package com.fintech.ppryvarnikov.postalservice.web;
 
 import com.fintech.ppryvarnikov.postalservice.model.Client;
 import com.fintech.ppryvarnikov.postalservice.model.Delivery;
+import com.fintech.ppryvarnikov.postalservice.model.ParcelStatus;
 import com.fintech.ppryvarnikov.postalservice.service.ClientService;
 import com.fintech.ppryvarnikov.postalservice.service.DeliveryService;
 import com.fintech.ppryvarnikov.postalservice.web.logic.UnprocessedDeliveriesFinder;
@@ -35,7 +36,12 @@ public class DeliveryController {
     @PostMapping("/create-delivery")
     public Delivery createDelivery(@RequestBody Delivery delivery, HttpSession session) throws AuthException, HttpSessionRequiredException {
         Client client = getClientByHttpSession(session);
-        delivery = delivery.toBuilder().client(client).build();
+        delivery = delivery.toBuilder()
+                .parcelStatus(ParcelStatus.builder()
+                        .id((short) 1)
+                        .build())
+                .client(client)
+                .build();
         delivery = deliveryService.save(delivery);
         log.info("New delivery created successfully: {}", delivery);
         delivery = deliveryService.findById(delivery.getId()).orElseThrow();
@@ -59,7 +65,11 @@ public class DeliveryController {
     public List<Delivery> createDeliveries(@RequestBody List<Delivery> deliveries, HttpSession session) throws AuthException, HttpSessionRequiredException {
         Client client = getClientByHttpSession(session);
         deliveries = deliveries.stream()
-                .map(delivery -> delivery.toBuilder().client(client).build())
+                .map(delivery -> delivery.toBuilder()
+                        .parcelStatus(ParcelStatus.builder()
+                                .id((short) 1)
+                                .build())
+                        .client(client).build())
                 .collect(Collectors.toList());
         deliveries = deliveryService.saveAll(deliveries);
         deliveries = deliveries.stream()

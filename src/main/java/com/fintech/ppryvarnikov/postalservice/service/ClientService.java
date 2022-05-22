@@ -37,10 +37,28 @@ public class ClientService implements IClient {
 
     @Override
     public Client save(Client client) throws InstanceAlreadyExistsException {
+        String illegalArguments = showIllegalArguments(client);
+        if (!illegalArguments.isEmpty()) {
+            throw new IllegalArgumentException("The following fields cannot be null: " + illegalArguments);
+        }
         if (clientRepository.findByPhoneNumber(client.getPhoneNumber()).isPresent()) {
             throw new InstanceAlreadyExistsException("A client with this phone number already exists.");
         }
         return clientRepository.save(client);
+    }
+
+    private String showIllegalArguments(Client client) {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (client.getSurname() == null) {
+            stringBuilder.append("'surname' ");
+        }
+        if (client.getFirstName() == null) {
+            stringBuilder.append("'firstName' ");
+        }
+        if (client.getPhoneNumber() == null) {
+            stringBuilder.append("'phoneNumber'");
+        }
+        return stringBuilder.toString();
     }
 
     @Override
