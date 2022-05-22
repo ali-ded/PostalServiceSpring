@@ -34,45 +34,39 @@ public class DeliveryController {
 
     @PostMapping("/create-delivery")
     public Delivery createDelivery(@RequestBody Delivery delivery, HttpSession session) throws AuthException, HttpSessionRequiredException {
-        if (session.isNew()) {
-            session.invalidate();
+        Client client = getClientByHttpSession(session);
+        delivery = delivery.toBuilder().client(client).build();
+        delivery = deliveryService.save(delivery);
+        log.info("New delivery created successfully: {}", delivery);
+        delivery = deliveryService.findById(delivery.getId()).orElseThrow();
+        unprocessedDeliveriesFinder.run();
+        return delivery;
+    }
+
+    private Client getClientByHttpSession(HttpSession session) throws AuthException, HttpSessionRequiredException {
+        Long clientId = (Long) session.getAttribute("clientId");
+        if (clientId == null) {
             throw new AuthException("You are not authenticated. Log in please.");
         }
 
-        Client client = clientService
-                .findById((Long) session.getAttribute("clientId"))
-                .orElseThrow(() -> new HttpSessionRequiredException("Session expired, please login."));
-
-        delivery = delivery.toBuilder().client(client).build();
-
-        deliveryService.save(delivery);
-        log.info("New delivery created successfully: {}", delivery);
-
-        unprocessedDeliveriesFinder.run();
-
-        return delivery;
+        return (clientService
+                .findById(clientId)
+                .orElseThrow(() -> new HttpSessionRequiredException("Session expired, please login."))
+        );
     }
 
     @PostMapping("/create-deliveries")
     public List<Delivery> createDeliveries(@RequestBody List<Delivery> deliveries, HttpSession session) throws AuthException, HttpSessionRequiredException {
-        if (session.isNew()) {
-            session.invalidate();
-            throw new AuthException("You are not authenticated. Log in please.");
-        }
-
-        Client client = clientService
-                .findById((Long) session.getAttribute("clientId"))
-                .orElseThrow(() -> new HttpSessionRequiredException("Session expired, please login."));
-
+        Client client = getClientByHttpSession(session);
         deliveries = deliveries.stream()
                 .map(delivery -> delivery.toBuilder().client(client).build())
                 .collect(Collectors.toList());
-
-        deliveryService.saveAll(deliveries);
+        deliveries = deliveryService.saveAll(deliveries);
+        deliveries = deliveries.stream()
+                .map(delivery -> delivery = deliveryService.findById(delivery.getId()).orElseThrow())
+                .collect(Collectors.toList());
         log.info("New deliveries created: {}", deliveries.size());
-
         unprocessedDeliveriesFinder.run();
-
         return deliveries;
     }
 

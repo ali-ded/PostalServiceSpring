@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.InstanceAlreadyExistsException;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,14 +36,17 @@ public class ClientService implements IClient {
     }
 
     @Override
-    public Client save(Client client) {
+    public Client save(Client client) throws InstanceAlreadyExistsException {
+        if (clientRepository.findByPhoneNumber(client.getPhoneNumber()).isPresent()) {
+            throw new InstanceAlreadyExistsException("A client with this phone number already exists.");
+        }
         return clientRepository.save(client);
     }
 
     @Override
     public boolean update(Client client) {
         boolean operationResult = false;
-        int updatedRows = 0;
+        int updatedRows;
 
         updatedRows = clientRepository.update(client.getId(),
                 client.getSurname(),

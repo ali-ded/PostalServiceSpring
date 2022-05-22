@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.management.InstanceAlreadyExistsException;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -24,7 +25,7 @@ public class ClientController {
     }
 
     @PostMapping("/registration")
-    public String registration(@RequestBody Client client) {
+    public String registration(@RequestBody Client client) throws InstanceAlreadyExistsException {
         clientService.save(client);
         log.info("New client registered successfully: {}", client);
         return String.format("The new client with id %d was saved successfully.", client.getId());

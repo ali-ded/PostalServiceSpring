@@ -11,6 +11,5 @@ public class PostalServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PostalServiceApplication.class, args);
 	}
-
 }
 

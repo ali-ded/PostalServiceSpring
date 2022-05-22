@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.management.InstanceAlreadyExistsException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -22,15 +23,15 @@ public class DepartmentController {
     }
 
     @PostMapping("/create-department")
-    public Department createDepartment(@RequestBody Department department) {
-        departmentService.save(department);
+    public Department createDepartment(@RequestBody String description) throws InstanceAlreadyExistsException {
+        Department department = departmentService.save(description);
         log.info("New department successfully created: {}", department);
         return department;
     }
 
     @PostMapping("/create-multiple-departments")
-    public List<Department> createDepartments(@RequestBody List<Department> departments) {
-        departmentService.saveAll(departments);
+    public List<Department> createDepartments(@RequestBody List<String> departmentNames) throws InstanceAlreadyExistsException {
+        List<Department> departments = departmentService.saveAll(departmentNames);
         log.info("Departments group successfully created: {}", departments);
         return departments;
     }
