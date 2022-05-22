@@ -57,10 +57,12 @@ public class DeliveryService implements IDelivery {
 
     private String showIllegalArguments(Delivery delivery) {
         StringBuilder illegalArguments = new StringBuilder();
-        if (departmentRepository.findById(delivery.getDepartmentSender().getId()).isEmpty()) {
+        if (delivery.getDepartmentSender() == null || delivery.getDepartmentSender().getId() == null ||
+                departmentRepository.findById(delivery.getDepartmentSender().getId()).isEmpty()) {
             illegalArguments.append("'departmentSender' - there is no department for the given ID ");
         }
-        if (departmentRepository.findById(delivery.getDepartmentRecipient().getId()).isEmpty()) {
+        if (delivery.getDepartmentRecipient() == null || delivery.getDepartmentRecipient().getId() == null ||
+                departmentRepository.findById(delivery.getDepartmentRecipient().getId()).isEmpty()) {
             illegalArguments.append("'departmentRecipient' - there is no department for the given ID ");
         }
         if (delivery.getRecipientPhone() == null) {
