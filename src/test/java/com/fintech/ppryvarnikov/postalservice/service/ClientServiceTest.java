@@ -2,6 +2,7 @@ package com.fintech.ppryvarnikov.postalservice.service;
 
 import com.fintech.ppryvarnikov.postalservice.model.Client;
 import com.fintech.ppryvarnikov.postalservice.repository.ClientRepository;
+import com.fintech.ppryvarnikov.postalservice.service.implementation.ClientServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,12 +24,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ClientServiceTest {
     private ClientRepository clientRepository;
-    private ClientService clientService;
+    private ClientServiceImpl clientService;
 
     @BeforeEach
     void setUp() {
         clientRepository = Mockito.mock(ClientRepository.class);
-        clientService = new ClientService(clientRepository);
+        clientService = new ClientServiceImpl(clientRepository);
     }
 
     @ParameterizedTest

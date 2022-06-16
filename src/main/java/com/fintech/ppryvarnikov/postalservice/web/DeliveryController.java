@@ -5,7 +5,6 @@ import com.fintech.ppryvarnikov.postalservice.model.Delivery;
 import com.fintech.ppryvarnikov.postalservice.model.ParcelStatus;
 import com.fintech.ppryvarnikov.postalservice.service.ClientService;
 import com.fintech.ppryvarnikov.postalservice.service.DeliveryService;
-import com.fintech.ppryvarnikov.postalservice.web.logic.UnprocessedDeliveriesFinder;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,8 +23,6 @@ import java.util.stream.Collectors;
 public class DeliveryController {
     private final DeliveryService deliveryService;
     private final ClientService clientService;
-    @Autowired
-    private UnprocessedDeliveriesFinder unprocessedDeliveriesFinder;
 
     @Autowired
     public DeliveryController(DeliveryService deliveryService, ClientService clientService) {
@@ -34,18 +31,17 @@ public class DeliveryController {
     }
 
     @PostMapping("/create-delivery")
-    public Delivery createDelivery(@RequestBody Delivery delivery, HttpSession session) throws AuthException, HttpSessionRequiredException {
+    public Delivery createDelivery(@RequestBody Delivery deliveryDto, HttpSession session) throws AuthException, HttpSessionRequiredException {
         Client client = getClientByHttpSession(session);
-        delivery = delivery.toBuilder()
+        deliveryDto = deliveryDto.toBuilder()
                 .parcelStatus(ParcelStatus.builder()
                         .id((short) 1)
                         .build())
                 .client(client)
                 .build();
-        delivery = deliveryService.save(delivery);
-        log.info("New delivery created successfully: {}", delivery);
+        Delivery delivery = deliveryService.save(deliveryDto);
         delivery = deliveryService.findById(delivery.getId()).orElseThrow();
-        unprocessedDeliveriesFinder.run();
+        log.info("New delivery created successfully: {}", delivery);
         return delivery;
     }
 
@@ -62,21 +58,20 @@ public class DeliveryController {
     }
 
     @PostMapping("/create-deliveries")
-    public List<Delivery> createDeliveries(@RequestBody List<Delivery> deliveries, HttpSession session) throws AuthException, HttpSessionRequiredException {
+    public List<Delivery> createDeliveries(@RequestBody List<Delivery> deliveriesDto, HttpSession session) throws AuthException, HttpSessionRequiredException {
         Client client = getClientByHttpSession(session);
-        deliveries = deliveries.stream()
+        deliveriesDto = deliveriesDto.stream()
                 .map(delivery -> delivery.toBuilder()
                         .parcelStatus(ParcelStatus.builder()
                                 .id((short) 1)
                                 .build())
                         .client(client).build())
                 .collect(Collectors.toList());
-        deliveries = deliveryService.saveAll(deliveries);
+        List<Delivery> deliveries = deliveryService.saveAll(deliveriesDto);
         deliveries = deliveries.stream()
                 .map(delivery -> delivery = deliveryService.findById(delivery.getId()).orElseThrow())
                 .collect(Collectors.toList());
         log.info("New deliveries created: {}", deliveries.size());
-        unprocessedDeliveriesFinder.run();
         return deliveries;
     }
 

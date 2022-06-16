@@ -7,7 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,7 +20,7 @@ public interface DeliveryRepository extends CrudRepository<Delivery, Long> {
             "where id = :deliveryId", nativeQuery = true)
     int update(@Param("deliveryId") Long deliveryId,
                 @Param("parcelStatusId") Short parcelStatusId,
-                @Param("dateTimeStatusChange") Timestamp dateTimeStatusChange);
+                @Param("dateTimeStatusChange") LocalDateTime dateTimeStatusChange);
 
     @Query(value = "select * " +
             "from deliveries d " +

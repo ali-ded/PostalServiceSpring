@@ -1,11 +1,10 @@
 package com.fintech.ppryvarnikov.postalservice.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @Table(name = "deliveries")
@@ -51,21 +50,10 @@ public class Delivery {
             .build();
 
     @Column(name = "date_time_creation", nullable = false)
-    private final Timestamp dateTimeCreation = Timestamp.valueOf(LocalDateTime.now());
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss.SSS")
+    private final LocalDateTime dateTimeCreation = LocalDateTime.now();
 
     @Column(name = "date_time_status_change")
-    private Timestamp dateTimeStatusChange;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Delivery delivery = (Delivery) o;
-        return id.equals(delivery.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss.SSS")
+    private LocalDateTime dateTimeStatusChange;
 }

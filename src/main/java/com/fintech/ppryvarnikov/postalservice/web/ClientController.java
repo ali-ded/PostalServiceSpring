@@ -25,16 +25,16 @@ public class ClientController {
     }
 
     @PostMapping("/registration")
-    public String registration(@RequestBody Client client) throws InstanceAlreadyExistsException {
-        clientService.save(client);
-        log.info("New client registered successfully: {}", client);
+    public String registration(@RequestBody Client clientDto) throws InstanceAlreadyExistsException {
+        Client client = clientService.save(clientDto);
+        log.info("New client registered successfully: {}", clientDto);
         return String.format("The new client with id %d was saved successfully.", client.getId());
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody Long phoneNumber, HttpSession session) throws LoginException {
+    public String login(@RequestBody Client clientDto, HttpSession session) throws LoginException {
         Client client = clientService
-                .findByPhoneNumber(phoneNumber)
+                .findByPhoneNumber(clientDto.getPhoneNumber())
                 .orElseThrow(() -> new LoginException("No client found with this phone number."));
         session.setAttribute("clientId", client.getId());
         log.info("Client with id {} successfully logged in.", client.getId());
@@ -42,7 +42,7 @@ public class ClientController {
     }
 
     @GetMapping("/find-client-by-id")
-    public Client findClientById(@RequestParam("id") Long id) {
+    public Client findClientById(@RequestParam("id") Long id) throws NoSuchElementException {
         return clientService
                 .findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Client with id number " + id + " not found.")

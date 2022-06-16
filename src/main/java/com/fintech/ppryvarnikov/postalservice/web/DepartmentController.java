@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.management.InstanceAlreadyExistsException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
@@ -23,15 +24,20 @@ public class DepartmentController {
     }
 
     @PostMapping("/create-department")
-    public Department createDepartment(@RequestBody String description) throws InstanceAlreadyExistsException {
-        Department department = departmentService.save(description);
+    public Department createDepartment(@RequestBody Department departmentDto) throws InstanceAlreadyExistsException {
+        Department department = departmentService.save(departmentDto.toBuilder()
+                .id(null)
+                .build());
         log.info("New department successfully created: {}", department);
         return department;
     }
 
-    @PostMapping("/create-multiple-departments")
-    public List<Department> createDepartments(@RequestBody List<String> departmentNames) throws InstanceAlreadyExistsException {
-        List<Department> departments = departmentService.saveAll(departmentNames);
+    @PostMapping("/create-departments")
+    public List<Department> createDepartments(@RequestBody List<Department> departmentsDto) throws InstanceAlreadyExistsException {
+        departmentsDto = departmentsDto.stream()
+                .map(department -> department.toBuilder().id(null).build())
+                .collect(Collectors.toList());
+        List<Department> departments = departmentService.saveAll(departmentsDto);
         log.info("Departments group successfully created: {}", departments);
         return departments;
     }

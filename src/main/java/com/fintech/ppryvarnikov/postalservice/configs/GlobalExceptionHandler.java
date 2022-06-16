@@ -16,7 +16,7 @@ import java.util.Map;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(value = HttpStatus.I_AM_A_TEAPOT)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ResponseBody
     public Map<String, String> handleValidationException(Exception ex) {
         log.warn("Handle validation exception '{}': {}", ex.getClass().getSimpleName(), ex.getMessage());
