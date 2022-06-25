@@ -10,7 +10,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
-	<groupId>com.fintech.ppryvarnikov</groupId>
+	<groupId>com.ppryvarnikov.postalservice</groupId>
 	<artifactId>postalservice</artifactId>
 	<version>1.0</version>
 	<name>Postal service</name>
